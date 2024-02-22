@@ -1,0 +1,51 @@
+name: pixvibe_clone
+description: A new Flutter project.
+
+publish_to: 'none' 
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.2 <4.0.0'
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+
+  # Core
+  kartal: ^3.5.0
+  equatable: ^2.0.5
+
+  # Database
+  shared_preferences: ^2.2.2
+
+  # Language
+  easy_localization: ^3.0.4
+
+  # UI
+  image: ^4.1.7
+  image_picker: ^1.0.7
+
+  # State Management
+  provider: ^6.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  very_good_analysis: ^5.1.0
+
+
+
+flutter:
+  uses-material-design: true
+
+  
+  assets:
+    - assets/translations/
+  
+
+  
