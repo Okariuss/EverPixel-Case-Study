@@ -1,5 +1,7 @@
 {
     "home": {
-        "title": "Home Page"
+        "title": "Home Page",
+        "gallery": "Gallery",
+        "camera": "Camera"
     }
 }
