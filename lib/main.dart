@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
       locale: ProductLocalization.getDeviceLocale(context: context),
-      home: const HomePage(),
+      home: HomePage(),
     );
   }
 }
