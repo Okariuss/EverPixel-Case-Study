@@ -2,10 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../edit/edit_image_page.dart';
+import '../../product/base/base_view_model.dart';
+import '../edit/edit_page.dart';
 import 'home_repo.dart';
 
-class HomeViewModel extends ChangeNotifier {
+class HomeViewModel extends BaseViewModel {
   final HomeRepository repo = HomeRepository();
 
   List<File> get imageList => repo.imageList;
@@ -24,49 +25,90 @@ class HomeViewModel extends ChangeNotifier {
   }
 
   Future<void> loadGalleryHeaders() async {
-    await repo.loadGalleryHeaders();
-    notifyListeners();
+    try {
+      setBusy(true);
+      await repo.loadGalleryHeaders();
+    } catch (e) {
+      print('Error loading gallery headers: $e');
+    } finally {
+      setBusy(false);
+    }
   }
 
   Future<void> loadImages(String header) async {
-    await repo.loadImages(header);
-    notifyListeners();
+    try {
+      setBusy(true);
+      await repo.loadImages(header);
+    } catch (e) {
+      print('Error loading images: $e');
+    } finally {
+      setBusy(false);
+    }
   }
 
   Future<void> takePhoto(BuildContext context) async {
-    var path = await repo.takePhoto();
-    await loadGalleryHeaders();
-    await loadImages(selectedHeader);
-    if (path != null) {
-      navigateToEditPageWithImage(context, path);
+    try {
+      setBusy(true);
+      var path = await repo.takePhoto();
+      await loadGalleryHeaders();
+      await loadImages(selectedHeader);
+      if (path != null) {
+        navigateToEditPageWithImage(context, path);
+      }
+    } catch (e) {
+      print('Error taking photo: $e');
+    } finally {
+      setBusy(false);
     }
-    notifyListeners();
   }
 
   Future<void> selectImage(BuildContext context) async {
-    var path = await repo.selectImage();
-    if (path != null) {
-      navigateToEditPageWithImage(context, path);
+    try {
+      setBusy(true);
+      var path = await repo.selectImage();
+      if (path != null) {
+        navigateToEditPageWithImage(context, path);
+      }
+    } catch (e) {
+      print('Error selecting image: $e');
+    } finally {
+      setBusy(false);
     }
   }
 
   Future<void> navigateToEditPageWithImage(
       BuildContext context, String path) async {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditImagePage(imagePath: path),
-      ),
-    );
+    try {
+      setBusy(true);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditPage(
+            imagePath: path,
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Error navigating to edit page: $e');
+    } finally {
+      setBusy(false);
+    }
   }
 
   void onTapHeaderChip(int index) {
-    final bool isSelected = selectedIndex == index;
-    if (isSelected) {
-      clearSelection();
-    } else {
-      selectChip(index);
-      loadImages(galleryHeaders[index]);
+    try {
+      setBusy(true);
+      final bool isSelected = selectedIndex == index;
+      if (isSelected) {
+        clearSelection();
+      } else {
+        selectChip(index);
+        loadImages(galleryHeaders[index]);
+      }
+    } catch (e) {
+      print('Error handling tap header chip: $e');
+    } finally {
+      setBusy(false);
     }
   }
 }
