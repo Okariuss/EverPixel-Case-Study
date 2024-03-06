@@ -1,5 +1,7 @@
 {
     "home": {
-        "title": "Ana Sayfa"
+        "title": "Ana Sayfa",
+        "gallery": "Galeri",
+        "camera": "Kamera"
     }
 }
