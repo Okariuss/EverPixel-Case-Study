@@ -14,10 +14,26 @@ class EditPage extends StatelessWidget {
     return BaseWidget<EditViewModel>(
       viewModel: EditViewModel(imagePath),
       builder: (context, model, child) => Scaffold(
-        appBar: AppBar(title: const Text('Edit Image')),
+        appBar: AppBar(
+          title: const Text('Edit Image'),
+          actions:
+              model.isImageEdited ? _buildAppBarActions(context, model) : null,
+        ),
         body: _buildBody(context, model),
       ),
     );
+  }
+
+  List<Widget> _buildAppBarActions(BuildContext context, EditViewModel model) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.save),
+        onPressed: () async {
+          bool? shouldReturn = await model.saveImageToGallery(model.imageBytes);
+          Navigator.pop(context, shouldReturn);
+        },
+      ),
+    ];
   }
 
   Widget _buildBody(BuildContext context, EditViewModel model) {
@@ -32,9 +48,11 @@ class EditPage extends StatelessWidget {
       child: Column(
         children: [
           _buildImagePreview(model),
-          model.showPreview
-              ? _buildFilterPreview(context, model)
-              : _buildEditOptions(model),
+          model.showTunes
+              ? _buildTunePreview(context, model)
+              : model.showPreview
+                  ? _buildFilterPreview(context, model)
+                  : _buildEditOptions(model),
         ],
       ),
     );
@@ -77,6 +95,70 @@ class EditPage extends StatelessWidget {
     );
   }
 
+  Widget _buildTunePreview(BuildContext context, EditViewModel model) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildTuneControls(model),
+          _buildApplyCancelButtonRow(model),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTuneControls(EditViewModel model) {
+    return Column(
+      children: [
+        _createSlider(
+            value: model.contrast,
+            onChanged: (value) => model.updateTuneValues(
+                value, model.saturation, model.brightness),
+            min: 0,
+            max: 2,
+            label: "Contrast"),
+        _createSlider(
+            value: model.saturation,
+            onChanged: (value) {
+              model.updateTuneValues(model.contrast, value, model.brightness);
+            },
+            min: 0,
+            max: 2,
+            label: "Saturation"),
+        _createSlider(
+            value: model.brightness,
+            onChanged: (value) =>
+                model.updateTuneValues(model.contrast, model.saturation, value),
+            min: 0,
+            max: 2,
+            label: "Brightness"),
+      ],
+    );
+  }
+
+  Widget _createSlider({
+    required double value,
+    required Function(double) onChanged,
+    required double min,
+    required double max,
+    required String label,
+  }) {
+    return Column(
+      children: [
+        Text(label, style: TextStyle(color: Colors.white)),
+        Slider(
+          value: value,
+          min: min,
+          max: max,
+          divisions: (max - min).toInt() * 25,
+          label: value.toStringAsFixed(2),
+          onChanged: (newValue) {
+            onChanged(newValue);
+          },
+        ),
+      ],
+    );
+  }
+
   Widget _buildFilterPreview(BuildContext context, EditViewModel model) {
     return Expanded(
       flex: 2,
@@ -84,7 +166,7 @@ class EditPage extends StatelessWidget {
         children: [
           Expanded(
             flex: 2,
-            child: _buildFilterListView(context, model),
+            child: _buildFilterListView(model),
           ),
           _buildApplyCancelButtonRow(model),
         ],
@@ -92,7 +174,7 @@ class EditPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterListView(BuildContext context, EditViewModel model) {
+  Widget _buildFilterListView(EditViewModel model) {
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       itemCount: model.filterPreviews.length,
@@ -136,7 +218,11 @@ class EditPage extends StatelessWidget {
       children: [
         IconButton(
             icon: const Icon(Icons.clear, color: Colors.white),
-            onPressed: model.toggleOptions),
+            onPressed: model.showPreview
+                ? model.toggleOptions
+                : model.showTunes
+                    ? model.toggleTune
+                    : null),
         IconButton(
             icon: const Icon(Icons.check, color: Colors.white),
             onPressed: model.applyEdit),
@@ -152,7 +238,8 @@ class EditPage extends StatelessWidget {
         children: [
           ElevatedButton(
               onPressed: model.toggleOptions, child: const Text("Filter")),
-          ElevatedButton(onPressed: () {}, child: const Text("Tune")),
+          ElevatedButton(
+              onPressed: model.toggleTune, child: const Text("Tune")),
         ],
       ),
     );

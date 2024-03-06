@@ -80,7 +80,7 @@ class HomeViewModel extends BaseViewModel {
       BuildContext context, String path) async {
     try {
       setBusy(true);
-      Navigator.push(
+      bool? shouldReload = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => EditPage(
@@ -88,6 +88,11 @@ class HomeViewModel extends BaseViewModel {
           ),
         ),
       );
+
+      if (shouldReload == true) {
+        await loadGalleryHeaders();
+        await loadImages(selectedHeader);
+      }
     } catch (e) {
       print('Error navigating to edit page: $e');
     } finally {
